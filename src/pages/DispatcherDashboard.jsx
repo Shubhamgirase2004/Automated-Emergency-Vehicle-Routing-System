@@ -12,7 +12,7 @@ import {
   Heart
 } from 'lucide-react';
 
-const DispatcherDashboard: React.FC = () => {
+const DispatcherDashboard = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     dispatchLocation: '',
@@ -22,7 +22,7 @@ const DispatcherDashboard: React.FC = () => {
     incidentType: ''
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
@@ -30,7 +30,7 @@ const DispatcherDashboard: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     // Simulate route generation
     setTimeout(() => {
@@ -176,7 +176,7 @@ const DispatcherDashboard: React.FC = () => {
                           className="w-4 h-4 text-red-600 focus:ring-red-500"
                         />
                         <div className="flex items-center space-x-2">
-                          <div className={`w-3 h-3 rounded-full ${priorityColors[priority.value as keyof typeof priorityColors]}`}></div>
+                          <div className={`w-3 h-3 rounded-full ${priorityColors[priority.value]}`}></div>
                           <span className="text-sm font-medium text-gray-700">{priority.label}</span>
                           <span className="text-xs text-gray-500">({priority.description})</span>
                         </div>
@@ -209,7 +209,7 @@ const DispatcherDashboard: React.FC = () => {
                   { id: 'D002', type: 'police', status: 'Dispatched', time: '7 min ago' },
                   { id: 'D003', type: 'fire', status: 'Arrived', time: '15 min ago' }
                 ].map((dispatch) => {
-                  const VehicleIcon = vehicleIcons[dispatch.type as keyof typeof vehicleIcons];
+                  const VehicleIcon = vehicleIcons[dispatch.type];
                   return (
                     <div key={dispatch.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                       <div className="flex items-center space-x-3">

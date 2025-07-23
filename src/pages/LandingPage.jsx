@@ -3,7 +3,7 @@ import HeroSection from '../components/HeroSection';
 import AboutSection from '../components/AboutSection';
 import FeaturesSection from '../components/FeaturesSection';
 
-const LandingPage: React.FC = () => {
+const LandingPage = () => {
   return (
     <div className="space-y-0">
       <HeroSection />

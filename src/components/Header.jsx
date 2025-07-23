@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Shield, User } from 'lucide-react';
 
-const Header: React.FC = () => {
+const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const location = useLocation();
 
@@ -13,7 +13,7 @@ const Header: React.FC = () => {
     { name: 'Analytics', href: '/analytics' },
   ];
 
-  const isActive = (path: string) => location.pathname === path;
+  const isActive = (path) => location.pathname === path;
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -49,7 +49,7 @@ const Header: React.FC = () => {
             <div className="hidden md:block">
               <User className="h-6 w-6 text-gray-600 hover:text-red-600 cursor-pointer transition-colors" />
             </div>
-            
+
             {/* Mobile menu button */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}

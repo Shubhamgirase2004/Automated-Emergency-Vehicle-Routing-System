@@ -10,7 +10,7 @@ import {
   Calendar
 } from 'lucide-react';
 
-const Analytics: React.FC = () => {
+const Analytics = () => {
   const stats = [
     {
       title: 'Total Dispatches',
@@ -104,7 +104,7 @@ const Analytics: React.FC = () => {
               <h2 className="text-lg font-semibold text-gray-900">Monthly Performance</h2>
               <BarChart3 className="h-5 w-5 text-gray-500" />
             </div>
-            
+
             <div className="space-y-4">
               {monthlyData.map((month) => (
                 <div key={month.month} className="flex items-center justify-between">
@@ -132,7 +132,7 @@ const Analytics: React.FC = () => {
               <h2 className="text-lg font-semibold text-gray-900">Recent Dispatches</h2>
               <Calendar className="h-5 w-5 text-gray-500" />
             </div>
-            
+
             <div className="space-y-4">
               {recentDispatches.map((dispatch) => (
                 <div key={dispatch.id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
@@ -174,7 +174,7 @@ const Analytics: React.FC = () => {
         {/* System Health */}
         <div className="mt-8 bg-white rounded-lg shadow-sm p-6">
           <h2 className="text-lg font-semibold text-gray-900 mb-6">System Health</h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div className="text-center">
               <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -184,7 +184,7 @@ const Analytics: React.FC = () => {
               <p className="text-sm text-gray-600">All systems operational</p>
               <div className="mt-2 text-xs text-green-600">99.9% uptime</div>
             </div>
-            
+
             <div className="text-center">
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Users className="h-8 w-8 text-blue-600" />
@@ -193,7 +193,7 @@ const Analytics: React.FC = () => {
               <p className="text-sm text-gray-600">24 dispatchers online</p>
               <div className="mt-2 text-xs text-blue-600">Peak: 32 users</div>
             </div>
-            
+
             <div className="text-center">
               <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <AlertTriangle className="h-8 w-8 text-purple-600" />

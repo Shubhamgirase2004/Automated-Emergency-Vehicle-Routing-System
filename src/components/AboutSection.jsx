@@ -1,7 +1,7 @@
 import React from 'react';
 import { AlertTriangle, Cpu, Cloud, Smartphone } from 'lucide-react';
 
-const AboutSection: React.FC = () => {
+const AboutSection = () => {
   return (
     <section className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -22,7 +22,6 @@ const AboutSection: React.FC = () => {
               <AlertTriangle className="h-8 w-8 text-red-500" />
               <h3 className="text-2xl font-bold text-gray-900">The Problem</h3>
             </div>
-            
             <div className="space-y-4">
               <div className="bg-red-50 border-l-4 border-red-500 p-4">
                 <p className="text-red-700">
@@ -30,14 +29,12 @@ const AboutSection: React.FC = () => {
                   navigating through heavy traffic, especially in urban areas.
                 </p>
               </div>
-              
               <div className="bg-red-50 border-l-4 border-red-500 p-4">
                 <p className="text-red-700">
                   <strong>Poor Communication:</strong> Civilian drivers are often unaware of 
                   approaching emergency vehicles until it's too late to clear the path.
                 </p>
               </div>
-              
               <div className="bg-red-50 border-l-4 border-red-500 p-4">
                 <p className="text-red-700">
                   <strong>Infrastructure Costs:</strong> Traditional solutions require expensive 
@@ -53,7 +50,6 @@ const AboutSection: React.FC = () => {
               <Cpu className="h-8 w-8 text-blue-500" />
               <h3 className="text-2xl font-bold text-gray-900">Our Solution</h3>
             </div>
-            
             <div className="space-y-4">
               <div className="bg-blue-50 border-l-4 border-blue-500 p-4">
                 <div className="flex items-start space-x-3">
@@ -66,7 +62,6 @@ const AboutSection: React.FC = () => {
                   </div>
                 </div>
               </div>
-              
               <div className="bg-blue-50 border-l-4 border-blue-500 p-4">
                 <div className="flex items-start space-x-3">
                   <Smartphone className="h-5 w-5 text-blue-600 mt-0.5" />
@@ -78,7 +73,6 @@ const AboutSection: React.FC = () => {
                   </div>
                 </div>
               </div>
-              
               <div className="bg-blue-50 border-l-4 border-blue-500 p-4">
                 <div className="flex items-start space-x-3">
                   <AlertTriangle className="h-5 w-5 text-blue-600 mt-0.5" />
@@ -103,26 +97,31 @@ const AboutSection: React.FC = () => {
                 <span className="text-2xl font-bold text-green-600">60%</span>
               </div>
               <h4 className="text-lg font-semibold text-gray-900 mb-2">Faster Response</h4>
-              <p className="text-gray-600">Reduction in emergency response time through optimized routing</p>
+              <p className="text-gray-600">
+                Reduction in emergency response time through optimized routing
+              </p>
             </div>
-            
             <div className="text-center">
               <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-blue-600">₹0</span>
               </div>
               <h4 className="text-lg font-semibold text-gray-900 mb-2">Infrastructure Cost</h4>
-              <p className="text-gray-600">No hardware installation or maintenance required</p>
+              <p className="text-gray-600">
+                No hardware installation or maintenance required
+              </p>
             </div>
-            
             <div className="text-center">
               <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span className="text-2xl font-bold text-purple-600">100%</span>
               </div>
               <h4 className="text-lg font-semibold text-gray-900 mb-2">Scalable</h4>
-              <p className="text-gray-600">Easily deployable across any city or region</p>
+              <p className="text-gray-600">
+                Easily deployable across any city or region
+              </p>
             </div>
           </div>
         </div>
+        
       </div>
     </section>
   );

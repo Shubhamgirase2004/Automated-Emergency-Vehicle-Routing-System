@@ -10,7 +10,7 @@ import {
   Clock
 } from 'lucide-react';
 
-const FeaturesSection: React.FC = () => {
+const FeaturesSection = () => {
   const features = [
     {
       icon: Navigation,
