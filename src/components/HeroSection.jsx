@@ -5,6 +5,8 @@ import { Play, ArrowRight } from 'lucide-react';
 const HeroSection = () => {
   const [vehiclePosition, setVehiclePosition] = useState({ x: 0, y: 0 });
 
+  const isAuthenticated = !!localStorage.getItem('token'); // ✅ check JWT token presence
+
   useEffect(() => {
     const interval = setInterval(() => {
       setVehiclePosition((prev) => ({
@@ -12,7 +14,6 @@ const HeroSection = () => {
         y: 45 + Math.sin(prev.x * 0.1) * 5,
       }));
     }, 100);
-
     return () => clearInterval(interval);
   }, []);
 
@@ -36,7 +37,7 @@ const HeroSection = () => {
 
             <div className="flex flex-col sm:flex-row gap-4">
               <Link
-                to="/dispatcher"
+                to={isAuthenticated ? '/dispatcher' : '/signup'} // ✅ redirect logic
                 className="inline-flex items-center justify-center px-8 py-3 border border-transparent text-base font-medium rounded-md text-white bg-red-600 hover:bg-red-700 transition-colors group"
               >
                 Get Started
@@ -65,10 +66,11 @@ const HeroSection = () => {
             </div>
           </div>
 
+          {/* 🚑 Emergency Vehicle Animation Section */}
           <div className="relative">
             <div className="relative w-full h-96 bg-gradient-to-br from-blue-100 to-red-100 rounded-2xl overflow-hidden shadow-2xl">
-              
-              {/* Map Grid */}
+
+              {/* Grid Overlay */}
               <div className="absolute inset-0 opacity-20">
                 <div className="grid grid-cols-6 grid-rows-6 h-full">
                   {Array.from({ length: 36 }).map((_, i) => (

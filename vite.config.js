@@ -1,23 +1,25 @@
-// vite.config.js
-
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 
-// https://vitejs.dev/config/
-export default defineConfig({
-  plugins: [react()],
-  server: {
-    open: true, // Automatically open browser on dev start
-    port: 5173, // You can change this port if needed
-  },
-  build: {
-    outDir: 'dist', // Output directory for build files
-    sourcemap: true, // Handy for debugging production builds
-  },
-  resolve: {
-    alias: {
-      // Optional: Add '@' path alias for your project src
-      '@': '/src',
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '');
+  const apiTarget = env.VITE_API_URL || 'http://localhost:5000';
+
+  return {
+    plugins: [react()],
+    server: {
+      open: true,
+      port: 5173,
+      proxy: {
+        '/api': {
+          target: apiTarget,
+          changeOrigin: true,
+          secure: false,
+          rewrite: (path) => path.replace(/^\/api/, '')
+        }
+      }
     },
-  },
+    build: { outDir: 'dist', sourcemap: true },
+    resolve: { alias: { '@': '/src' } }
+  };
 });

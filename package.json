@@ -10,10 +10,15 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "axios": "^1.11.0",
+    "cors": "^2.8.5",
+    "firebase": "^12.0.0",
+    "framer-motion": "^12.23.9",
     "lucide-react": "^0.344.0",
     "mapbox-gl": "^3.13.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-hot-toast": "^2.5.2",
     "react-map-gl": "^7.0.20",
     "react-router-dom": "^7.6.3"
   },
@@ -21,6 +26,7 @@
     "@eslint/js": "^9.31.0",
     "@vitejs/plugin-react": "^4.3.1",
     "autoprefixer": "^10.4.18",
+    "dotenv": "^17.2.0",
     "eslint": "^9.31.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
@@ -28,6 +34,6 @@
     "globals": "^15.15.0",
     "postcss": "^8.4.35",
     "tailwindcss": "^3.4.1",
-    "vite": "^5.4.2"
+    "vite": "^7.0.5"
   }
 }

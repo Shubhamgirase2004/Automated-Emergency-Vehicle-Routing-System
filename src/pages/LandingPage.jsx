@@ -3,14 +3,12 @@ import HeroSection from '../components/HeroSection';
 import AboutSection from '../components/AboutSection';
 import FeaturesSection from '../components/FeaturesSection';
 
-const LandingPage = () => {
+export default function LandingPage() {
   return (
-    <div className="space-y-0">
+    <div>
       <HeroSection />
       <AboutSection />
       <FeaturesSection />
     </div>
   );
-};
-
-export default LandingPage;
+}
