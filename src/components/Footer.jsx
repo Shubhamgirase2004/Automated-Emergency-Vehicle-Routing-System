@@ -35,40 +35,6 @@ const Footer = () => {
               </a>
             </div>
           </div>
-
-          {/* Project Info */}
-          <div>
-            <h3 className="text-lg font-semibold text-white mb-4">Project</h3>
-            <ul className="space-y-2 text-gray-400">
-              <li>Final Year BTech Project</li>
-              <li>Computer Science Engineering</li>
-              <li>2024-2025</li>
-              <li>
-                <a href="#" className="hover:text-white transition-colors">
-                  Documentation
-                </a>
-              </li>
-            </ul>
-          </div>
-
-          {/* Contact */}
-          <div>
-            <h3 className="text-lg font-semibold text-white mb-4">Contact</h3>
-            <ul className="space-y-2 text-gray-400">
-              <li className="flex items-center space-x-2">
-                <Phone className="h-4 w-4" />
-                <span>+91 98765 43210</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <Mail className="h-4 w-4" />
-                <span>support@ers.edu</span>
-              </li>
-              <li className="flex items-center space-x-2">
-                <MapPin className="h-4 w-4" />
-                <span>Engineering College</span>
-              </li>
-            </ul>
-          </div>
         </div>
 
         <div className="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400">

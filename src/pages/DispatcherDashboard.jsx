@@ -1,19 +1,24 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  MapPin, 
-  Clock, 
-  AlertTriangle, 
-  Send, 
-  User, 
+import {
+  MapPin,
+  Clock,
+  AlertTriangle,
+  Send,
+  User,
   Navigation,
   Truck,
   Shield,
-  Heart
+  Heart,
+  LogOut
 } from 'lucide-react';
+import { useAuth } from '../context/auth';
+import toast from 'react-hot-toast';
 
 const DispatcherDashboard = () => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
+
   const [formData, setFormData] = useState({
     dispatchLocation: '',
     destination: '',
@@ -36,6 +41,16 @@ const DispatcherDashboard = () => {
     setTimeout(() => {
       navigate('/live-map', { state: { dispatchData: formData } });
     }, 1000);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast.success('Logged out successfully!');
+      navigate('/login');
+    } catch (error) {
+      toast.error('Failed to logout');
+    }
   };
 
   const priorityColors = {
@@ -66,6 +81,13 @@ const DispatcherDashboard = () => {
                 <div className="w-2 h-2 bg-green-500 rounded-full"></div>
                 <span className="text-sm text-gray-600">System Online</span>
               </div>
+              <button
+                onClick={handleLogout}
+                className="flex items-center bg-red-100 hover:bg-red-200 text-red-700 px-3 py-2 rounded-lg transition-all"
+              >
+                <LogOut className="h-4 w-4 mr-1" />
+                Logout
+              </button>
               <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
                 <User className="h-5 w-5 text-white" />
               </div>
@@ -73,12 +95,12 @@ const DispatcherDashboard = () => {
           </div>
         </div>
 
+        {/* Main Content */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Dispatch Form */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-6">Create Emergency Dispatch</h2>
-              
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
@@ -99,7 +121,6 @@ const DispatcherDashboard = () => {
                       />
                     </div>
                   </div>
-
                   <div>
                     <label htmlFor="destination" className="block text-sm font-medium text-gray-700 mb-2">
                       Destination
@@ -138,7 +159,6 @@ const DispatcherDashboard = () => {
                       <option value="rescue">Rescue Vehicle</option>
                     </select>
                   </div>
-
                   <div>
                     <label htmlFor="incidentType" className="block text-sm font-medium text-gray-700 mb-2">
                       Incident Type
@@ -198,9 +218,8 @@ const DispatcherDashboard = () => {
             </div>
           </div>
 
-          {/* Quick Stats and Actions */}
+          {/* Sidebar */}
           <div className="space-y-6">
-            {/* Active Dispatches */}
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Active Dispatches</h3>
               <div className="space-y-3">
@@ -242,14 +261,12 @@ const DispatcherDashboard = () => {
                     <span className="text-sm font-medium text-red-700">Emergency Alert</span>
                   </div>
                 </button>
-                
                 <button className="w-full text-left px-4 py-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
                   <div className="flex items-center space-x-3">
                     <Clock className="h-5 w-5 text-blue-600" />
                     <span className="text-sm font-medium text-blue-700">Schedule Dispatch</span>
                   </div>
                 </button>
-                
                 <button className="w-full text-left px-4 py-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors">
                   <div className="flex items-center space-x-3">
                     <Navigation className="h-5 w-5 text-green-600" />
