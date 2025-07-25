@@ -14,7 +14,8 @@ import {
   Wifi
 } from 'lucide-react';
 
-const MAPBOX_TOKEN = import.meta.env.VITE_MAPBOX_TOKEN;
+// Mapbox token as provided
+const MAPBOX_TOKEN = 'pk.eyJ1Ijoic2h1YmgtZ2lyYXNlMjciLCJhIjoiY21iYXd2YzdwMTEyMzJxc2NrYWQ1d3FkcSJ9.Z1yFrzGl6zUwixA3Zr-P4A';
 
 const LiveMapView = () => {
   const location = useLocation();
@@ -35,6 +36,37 @@ const LiveMapView = () => {
   const [notificationPulse, setNotificationPulse] = useState({});
   const [geofenceRadius] = useState(0.003); // ~300 meters
 
+  // --- Directions Route Preview State ---
+  const [routeData, setRouteData] = useState(null);
+
+  useEffect(() => {
+    if (
+      !dispatchData ||
+      !dispatchData.source ||
+      !dispatchData.destination
+    ) {
+      setRouteData(null);
+      return;
+    }
+    const fetchRoute = async () => {
+      try {
+        const { source, destination } = dispatchData;
+        const url = `https://api.mapbox.com/directions/v5/mapbox/driving/${source.longitude},${source.latitude};${destination.longitude},${destination.latitude}?geometries=geojson&access_token=${MAPBOX_TOKEN}`;
+        const response = await fetch(url);
+        const data = await response.json();
+        if (data.routes && data.routes.length > 0) {
+          setRouteData(data.routes[0].geometry);
+        } else {
+          setRouteData(null);
+        }
+      } catch (error) {
+        console.error('Failed to fetch directions:', error);
+        setRouteData(null);
+      }
+    };
+    fetchRoute();
+  }, [dispatchData]);
+
   // Get user's current location and initialize vehicles very close by
   useEffect(() => {
     if (navigator.geolocation) {
@@ -42,21 +74,18 @@ const LiveMapView = () => {
         (pos) => {
           const userLat = pos.coords.latitude;
           const userLng = pos.coords.longitude;
-          
           setUserLocation({ latitude: userLat, longitude: userLng });
-          
           setViewState({
             longitude: userLng,
             latitude: userLat,
             zoom: 16,
           });
-
           // Create vehicles VERY close to user's location (within 500m radius)
           const nearbyVehicles = [
             {
               id: 'EV001',
               type: 'emergency',
-              latitude: userLat + 0.0005, // ~50m north
+              latitude: userLat + 0.0005,
               longitude: userLng + 0.0008,
               color: '#dc2626',
               icon: "🚑",
@@ -68,7 +97,7 @@ const LiveMapView = () => {
             {
               id: 'CV001',
               type: 'civilian',
-              latitude: userLat + 0.0012, // ~120m northeast
+              latitude: userLat + 0.0012,
               longitude: userLng + 0.0015,
               color: '#2563eb',
               icon: "🚗",
@@ -80,7 +109,7 @@ const LiveMapView = () => {
             {
               id: 'CV002',
               type: 'civilian',
-              latitude: userLat - 0.0008, // ~80m south
+              latitude: userLat - 0.0008,
               longitude: userLng + 0.001,
               color: '#16a34a',
               icon: "🚗",
@@ -92,7 +121,7 @@ const LiveMapView = () => {
             {
               id: 'CV003',
               type: 'civilian',
-              latitude: userLat - 0.001, // ~100m southwest
+              latitude: userLat - 0.001,
               longitude: userLng - 0.0012,
               color: '#ca8a04',
               icon: "🚙",
@@ -104,7 +133,7 @@ const LiveMapView = () => {
             {
               id: 'CV004',
               type: 'civilian',
-              latitude: userLat + 0.002, // ~200m north
+              latitude: userLat + 0.002,
               longitude: userLng - 0.0005,
               color: '#a21caf',
               icon: "🚕",
@@ -116,7 +145,7 @@ const LiveMapView = () => {
             {
               id: 'EV002',
               type: 'emergency',
-              latitude: userLat - 0.0015, // ~150m southeast
+              latitude: userLat - 0.0015,
               longitude: userLng + 0.002,
               color: '#2563eb',
               icon: "🚓",
@@ -128,7 +157,7 @@ const LiveMapView = () => {
             {
               id: 'CV005',
               type: 'civilian',
-              latitude: userLat + 0.0008, // ~80m northwest
+              latitude: userLat + 0.0008,
               longitude: userLng - 0.002,
               color: '#e11d48',
               icon: "🚗",
@@ -140,7 +169,7 @@ const LiveMapView = () => {
             {
               id: 'EV003',
               type: 'emergency',
-              latitude: userLat - 0.0005, // ~50m southwest
+              latitude: userLat - 0.0005,
               longitude: userLng - 0.0008,
               color: '#16a34a',
               icon: "🚒",
@@ -150,7 +179,6 @@ const LiveMapView = () => {
               distance: "50m"
             }
           ];
-
           setVehicles(nearbyVehicles);
           setLocationLoaded(true);
         },
@@ -158,9 +186,7 @@ const LiveMapView = () => {
           console.error("Geolocation error:", error);
           const defaultLat = 40.7128;
           const defaultLng = -74.006;
-          
           setUserLocation({ latitude: defaultLat, longitude: defaultLng });
-          
           const defaultVehicles = [
             {
               id: 'EV001',
@@ -186,9 +212,8 @@ const LiveMapView = () => {
               notified: false,
               distance: "120m"
             },
-            // Add more default vehicles similar to above...
+            // Add more default vehicles similar to above if needed
           ];
-
           setVehicles(defaultVehicles);
           setLocationLoaded(true);
         }
@@ -219,14 +244,12 @@ const LiveMapView = () => {
       ...prev,
       [vehicleId]: true
     }));
-
     // Mark vehicle as notified
-    setVehicles(prev => 
-      prev.map(v => 
+    setVehicles(prev =>
+      prev.map(v =>
         v.id === vehicleId ? { ...v, notified: true } : v
       )
     );
-
     // Remove pulse effect after animation
     setTimeout(() => {
       setNotificationPulse(prev => ({
@@ -239,16 +262,13 @@ const LiveMapView = () => {
   // Simulate ongoing geofencing alerts
   useEffect(() => {
     if (!locationLoaded || vehicles.length === 0) return;
-
     const notificationInterval = setInterval(() => {
       // Find unnotified vehicles
       const unnotifiedVehicles = vehicles.filter(v => !v.notified);
-      
       if (unnotifiedVehicles.length > 0) {
         // Notify a random unnotified vehicle
         const randomVehicle = unnotifiedVehicles[Math.floor(Math.random() * unnotifiedVehicles.length)];
         triggerGeofenceNotification(randomVehicle.id);
-
         // Add to notifications panel
         const alertMessages = [
           `${randomVehicle.type === 'emergency' ? 'Emergency' : 'Civilian'} vehicle ${randomVehicle.id} notified`,
@@ -256,7 +276,6 @@ const LiveMapView = () => {
           `Geofence triggered: ${randomVehicle.id} received emergency protocol`,
           `Vehicle ${randomVehicle.id} - Route clearance requested`
         ];
-
         const newNotification = {
           id: Date.now(),
           type: 'geofence',
@@ -264,26 +283,22 @@ const LiveMapView = () => {
           message: alertMessages[Math.floor(Math.random() * alertMessages.length)],
           timestamp: new Date().toLocaleTimeString(),
         };
-        
         setNotifications(prev => [newNotification, ...prev.slice(0, 4)]);
       }
     }, 3000); // Send notification every 3 seconds
-
     return () => clearInterval(notificationInterval);
   }, [locationLoaded, vehicles, triggerGeofenceNotification]);
 
   // Vehicle position updates (very small movements)
   const updateVehiclePositions = useCallback(() => {
-    setVehicles(prevVehicles => 
+    setVehicles(prevVehicles =>
       prevVehicles.map(vehicle => {
-        // Very small movement around base position (max 0.0003 degrees ≈ 30m)
+        // Very small movement around base position
         const maxOffset = 0.0003;
         const newLongitude = vehicle.baseLongitude + (Math.random() - 0.5) * maxOffset;
         const newLatitude = vehicle.baseLatitude + (Math.random() - 0.5) * maxOffset;
-
         const longitude = isNaN(newLongitude) ? vehicle.baseLongitude : newLongitude;
         const latitude = isNaN(newLatitude) ? vehicle.baseLatitude : newLatitude;
-
         return {
           ...vehicle,
           longitude: Number(longitude.toFixed(7)),
@@ -308,12 +323,10 @@ const LiveMapView = () => {
   // Vehicle animation effect
   useEffect(() => {
     if (!locationLoaded || vehicles.length === 0) return;
-
     const interval = setInterval(() => {
       updateVehiclePositions();
       updateProgress();
     }, 2000);
-
     return () => clearInterval(interval);
   }, [locationLoaded, vehicles.length, updateVehiclePositions, updateProgress]);
 
@@ -324,7 +337,7 @@ const LiveMapView = () => {
       'circle-radius': {
         stops: [
           [0, 0],
-          [20, 300] // Adjust radius based on zoom
+          [20, 300]
         ],
         base: 2
       },
@@ -333,6 +346,22 @@ const LiveMapView = () => {
       'circle-stroke-width': 2,
       'circle-stroke-color': '#ff0000',
       'circle-stroke-opacity': 0.4
+    }
+  };
+
+  // --- Directions Route Line Layer ---
+  const routeLayer = {
+    id: 'route-line',
+    type: 'line',
+    source: 'route',
+    layout: {
+      'line-cap': 'round',
+      'line-join': 'round'
+    },
+    paint: {
+      'line-color': '#1978c8',
+      'line-width': 6,
+      'line-opacity': 0.75
     }
   };
 
@@ -422,12 +451,12 @@ const LiveMapView = () => {
                     </Marker>
                   )}
 
-                  {/* Render all vehicle markers with notification effects */}
+                  {/* Vehicle markers */}
                   {vehicles.map((vehicle) => {
                     if (
-                      !vehicle.longitude || 
-                      !vehicle.latitude || 
-                      isNaN(vehicle.longitude) || 
+                      !vehicle.longitude ||
+                      !vehicle.latitude ||
+                      isNaN(vehicle.longitude) ||
                       isNaN(vehicle.latitude)
                     ) {
                       return null;
@@ -455,8 +484,8 @@ const LiveMapView = () => {
                             color: '#fff',
                             fontWeight: 'bold',
                             fontSize: '16px',
-                            boxShadow: isNotified 
-                              ? '0 0 0 4px rgba(0,255,0,0.4), 0 2px 8px rgba(0,0,0,0.3)' 
+                            boxShadow: isNotified
+                              ? '0 0 0 4px rgba(0,255,0,0.4), 0 2px 8px rgba(0,0,0,0.3)'
                               : '0 2px 4px rgba(0,0,0,0.2)',
                             border: isNotified ? '3px solid #00FF00' : '2px solid #fff',
                             cursor: 'pointer',
@@ -504,6 +533,17 @@ const LiveMapView = () => {
                       </Marker>
                     );
                   })}
+
+                  {/* --- Directions Route Preview --- */}
+                  {routeData && (
+                    <Source id="route" type="geojson" data={{
+                      type: 'Feature',
+                      geometry: routeData
+                    }}>
+                      <Layer {...routeLayer} />
+                    </Source>
+                  )}
+
                 </Map>
               ) : (
                 <div className="flex items-center justify-center h-full bg-gray-100">

@@ -1,41 +1,129 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { 
-  MapPin, 
-  Clock, 
-  AlertTriangle, 
-  Send, 
-  User, 
+import {
+  MapPin,
+  Clock,
+  AlertTriangle,
+  Send,
+  User,
   Navigation,
   Truck,
   Shield,
-  Heart
+  Heart,
+  LocateFixed
 } from 'lucide-react';
+
+const MAPBOX_TOKEN = 'pk.eyJ1Ijoic2h1YmgtZ2lyYXNlMjciLCJhIjoiY21iYXd2YzdwMTEyMzJxc2NrYWQ1d3FkcSJ9.Z1yFrzGl6zUwixA3Zr-P4A';
 
 const DispatcherDashboard = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     dispatchLocation: '',
+    dispatchCoords: null,
     destination: '',
+    destinationCoords: null,
     priority: '1',
     vehicleType: 'ambulance',
     incidentType: ''
   });
+  const [geoError, setGeoError] = useState('');
+  const [gettingLocation, setGettingLocation] = useState(false);
+  const [isFetchingCoords, setIsFetchingCoords] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: value
+      [name]: value,
+      ...(name === 'dispatchLocation' ? { dispatchCoords: null } : {}),
+      ...(name === 'destination' ? { destinationCoords: null } : {})
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleGetCurrentLocation = async () => {
+    setGeoError('');
+    setGettingLocation(true);
+    if (!navigator.geolocation) {
+      setGeoError('Geolocation is not supported by your browser.');
+      setGettingLocation(false);
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const { latitude, longitude } = pos.coords;
+        setFormData(prev => ({
+          ...prev,
+          dispatchLocation: 'Current Location',
+          dispatchCoords: { latitude, longitude }
+        }));
+        setGettingLocation(false);
+      },
+      () => {
+        setGeoError('Unable to retrieve your location.');
+        setGettingLocation(false);
+      }
+    );
+  };
+
+  const fetchCoordinates = async (query) => {
+    if (!query) return null;
+    // Accept raw coordinates as well
+    if (/^-?\d+(\.\d+)?\s*,\s*-?\d+(\.\d+)?$/.test(query)) {
+      const [lat, lng] = query.split(',').map(x => Number(x.trim()));
+      if (!isNaN(lat) && !isNaN(lng)) return { latitude: lat, longitude: lng };
+    }
+    const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(query)}.json?access_token=${MAPBOX_TOKEN}&limit=1`;
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const data = await res.json();
+    if (data.features && data.features.length > 0) {
+      const [lng, lat] = data.features[0].center;
+      return { latitude: lat, longitude: lng };
+    }
+    return null;
+  };
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Simulate route generation
+    setGeoError('');
+    setIsFetchingCoords(true);
+
+    let sourceCoords = formData.dispatchCoords;
+    let destCoords = formData.destinationCoords;
+    try {
+      if (!sourceCoords) {
+        sourceCoords = await fetchCoordinates(formData.dispatchLocation);
+      }
+      if (!destCoords) {
+        destCoords = await fetchCoordinates(formData.destination);
+      }
+    } catch {
+      setGeoError('Geocoding failed. Check your input.');
+      setIsFetchingCoords(false);
+      return;
+    }
+    setIsFetchingCoords(false);
+
+    if (!sourceCoords || !destCoords) {
+      setGeoError("Please enter or select valid locations for both Dispatch and Destination.");
+      return;
+    }
+
+    const dispatchData = {
+      ...formData,
+      source: sourceCoords,
+      destination: destCoords
+    };
+
+    setFormData(f => ({
+      ...f,
+      dispatchCoords: sourceCoords,
+      destinationCoords: destCoords
+    }));
+
     setTimeout(() => {
-      navigate('/live-map', { state: { dispatchData: formData } });
-    }, 1000);
+      navigate('/live-map', { state: { dispatchData } });
+    }, 700);
   };
 
   const priorityColors = {
@@ -43,7 +131,6 @@ const DispatcherDashboard = () => {
     '2': 'bg-yellow-500 text-white',
     '3': 'bg-green-500 text-white'
   };
-
   const vehicleIcons = {
     ambulance: Heart,
     police: Shield,
@@ -78,28 +165,39 @@ const DispatcherDashboard = () => {
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-6">Create Emergency Dispatch</h2>
-              
+
               <form onSubmit={handleSubmit} className="space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
                     <label htmlFor="dispatchLocation" className="block text-sm font-medium text-gray-700 mb-2">
                       Dispatch Location
                     </label>
-                    <div className="relative">
-                      <MapPin className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
-                      <input
-                        type="text"
-                        id="dispatchLocation"
-                        name="dispatchLocation"
-                        value={formData.dispatchLocation}
-                        onChange={handleInputChange}
-                        className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                        placeholder="Enter starting location"
-                        required
-                      />
+                    <div className="relative flex space-x-2">
+                      <div className="flex-grow relative">
+                        <MapPin className="absolute left-3 top-3 h-5 w-5 text-gray-400" />
+                        <input
+                          type="text"
+                          id="dispatchLocation"
+                          name="dispatchLocation"
+                          value={formData.dispatchLocation}
+                          onChange={handleInputChange}
+                          className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
+                          placeholder="Enter address or use locator"
+                          required
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleGetCurrentLocation}
+                        disabled={gettingLocation}
+                        title="Use Current Location"
+                        className="p-2 bg-gray-100 border border-gray-300 rounded-lg hover:bg-gray-200 flex items-center justify-center"
+                      >
+                        <LocateFixed className="h-5 w-5 text-blue-600" />
+                        <span className="sr-only">Use current location</span>
+                      </button>
                     </div>
                   </div>
-
                   <div>
                     <label htmlFor="destination" className="block text-sm font-medium text-gray-700 mb-2">
                       Destination
@@ -113,12 +211,19 @@ const DispatcherDashboard = () => {
                         value={formData.destination}
                         onChange={handleInputChange}
                         className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-red-500 focus:border-transparent"
-                        placeholder="Enter destination"
+                        placeholder="Enter address or place"
                         required
                       />
                     </div>
                   </div>
                 </div>
+
+                {(geoError || isFetchingCoords) && (
+                  <div className="text-xs mt-1">
+                    {geoError && <div className="text-red-500">{geoError}</div>}
+                    {isFetchingCoords && <div className="text-blue-500">Resolving locations...</div>}
+                  </div>
+                )}
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div>
@@ -138,7 +243,6 @@ const DispatcherDashboard = () => {
                       <option value="rescue">Rescue Vehicle</option>
                     </select>
                   </div>
-
                   <div>
                     <label htmlFor="incidentType" className="block text-sm font-medium text-gray-700 mb-2">
                       Incident Type
@@ -155,7 +259,6 @@ const DispatcherDashboard = () => {
                     />
                   </div>
                 </div>
-
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-3">
                     Priority Level
@@ -184,11 +287,11 @@ const DispatcherDashboard = () => {
                     ))}
                   </div>
                 </div>
-
                 <div className="flex justify-end">
                   <button
                     type="submit"
                     className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-colors"
+                    disabled={isFetchingCoords}
                   >
                     <Send className="mr-2 h-5 w-5" />
                     Generate Route
@@ -197,10 +300,8 @@ const DispatcherDashboard = () => {
               </form>
             </div>
           </div>
-
           {/* Quick Stats and Actions */}
           <div className="space-y-6">
-            {/* Active Dispatches */}
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Active Dispatches</h3>
               <div className="space-y-3">
@@ -231,8 +332,6 @@ const DispatcherDashboard = () => {
                 })}
               </div>
             </div>
-
-            {/* Quick Actions */}
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
               <div className="space-y-3">
@@ -242,14 +341,12 @@ const DispatcherDashboard = () => {
                     <span className="text-sm font-medium text-red-700">Emergency Alert</span>
                   </div>
                 </button>
-                
                 <button className="w-full text-left px-4 py-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors">
                   <div className="flex items-center space-x-3">
                     <Clock className="h-5 w-5 text-blue-600" />
                     <span className="text-sm font-medium text-blue-700">Schedule Dispatch</span>
                   </div>
                 </button>
-                
                 <button className="w-full text-left px-4 py-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors">
                   <div className="flex items-center space-x-3">
                     <Navigation className="h-5 w-5 text-green-600" />

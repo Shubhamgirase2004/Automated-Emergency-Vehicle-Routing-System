@@ -10,6 +10,8 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@mapbox/mapbox-sdk": "^0.16.1",
+    "axios": "^1.11.0",
     "lucide-react": "^0.344.0",
     "mapbox-gl": "^3.13.0",
     "react": "^18.3.1",
