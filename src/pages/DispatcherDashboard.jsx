@@ -16,8 +16,8 @@ import { useAuth } from '../context/auth';
 import toast from 'react-hot-toast';
 
 const DispatcherDashboard = () => {
-  const navigate = useNavigate();
   const { logout } = useAuth();
+  const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
     dispatchLocation: '',
@@ -37,7 +37,6 @@ const DispatcherDashboard = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Simulate route generation
     setTimeout(() => {
       navigate('/live-map', { state: { dispatchData: formData } });
     }, 1000);
@@ -47,7 +46,7 @@ const DispatcherDashboard = () => {
     try {
       await logout();
       toast.success('Logged out successfully!');
-      navigate('/login');
+      navigate('/login/user');
     } catch (error) {
       toast.error('Failed to logout');
     }
@@ -67,37 +66,36 @@ const DispatcherDashboard = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
-        <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
-          <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-gray-900">Emergency Dispatcher Dashboard</h1>
-              <p className="text-gray-600 mt-1">Manage emergency vehicle dispatching and route optimization</p>
-            </div>
-            <div className="flex items-center space-x-4">
-              <div className="flex items-center space-x-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                <span className="text-sm text-gray-600">System Online</span>
-              </div>
-              <button
-                onClick={handleLogout}
-                className="flex items-center bg-red-100 hover:bg-red-200 text-red-700 px-3 py-2 rounded-lg transition-all"
-              >
-                <LogOut className="h-4 w-4 mr-1" />
-                Logout
-              </button>
-              <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-                <User className="h-5 w-5 text-white" />
-              </div>
-            </div>
+    <div className="min-h-screen bg-gray-50">
+      {/* ONLY Dashboard-specific Navbar */}
+      <div className="flex items-center justify-between px-10 py-5 bg-white border-b">
+        <div className="flex items-center gap-4">
+          <span className="text-2xl font-bold text-red-600 flex items-center">
+            <svg className="w-8 h-8 mr-3" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M4 6V4a2 2 0 012-2h12a2 2 0 012 2v2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/><rect x="2" y="6" width="20" height="16" rx="2" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            Emergency Route System
+          </span>
+          <span className="ml-6 text-base text-green-600 flex items-center">
+            <span className="w-2 h-2 bg-green-500 rounded-full mr-2"></span>
+            System Online
+          </span>
+        </div>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={handleLogout}
+            className="flex items-center bg-red-100 hover:bg-red-200 text-red-700 px-4 py-2 rounded-lg text-base transition"
+          >
+            <LogOut className="w-5 h-5 mr-2" />
+            Logout
+          </button>
+          <div className="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+            <User className="h-5 w-5 text-white" />
           </div>
         </div>
+      </div>
 
-        {/* Main Content */}
+      {/* Main Dashboard Content */}
+      <div className="py-8 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Dispatch Form */}
           <div className="lg:col-span-2">
             <div className="bg-white rounded-lg shadow-sm p-6">
               <h2 className="text-xl font-semibold text-gray-900 mb-6">Create Emergency Dispatch</h2>
@@ -275,6 +273,7 @@ const DispatcherDashboard = () => {
                 </button>
               </div>
             </div>
+
           </div>
         </div>
       </div>

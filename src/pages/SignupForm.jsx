@@ -4,12 +4,13 @@ import { UserPlus, Lock, Mail, User } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { useNavigate } from 'react-router-dom';
 
-export default function SignupForm({ onToggleForm }) {
+export default function SignupForm() {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
     password: '',
-    confirmPassword: ''
+    confirmPassword: '',
+    role: 'user', // default role user
   });
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -17,14 +18,14 @@ export default function SignupForm({ onToggleForm }) {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const { name, email, password, confirmPassword } = formData;
+    const { name, email, password, confirmPassword, role } = formData;
 
     if (!name || !email || !password || !confirmPassword) {
       toast.error('Please fill in all fields');
@@ -46,7 +47,7 @@ export default function SignupForm({ onToggleForm }) {
       const res = await fetch('http://localhost:5000/api/auth/signup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password })
+        body: JSON.stringify({ name, email, password, role }), // send role as part of request body
       });
 
       const data = await res.json();
@@ -57,8 +58,12 @@ export default function SignupForm({ onToggleForm }) {
 
       toast.success('Account created successfully!');
 
-      // Redirect to login page after signup
-      navigate('/login');
+      // Navigate based on role returned or selected
+      if (role === 'admin') {
+        navigate('/login/admin');
+      } else {
+        navigate('/login/user');
+      }
     } catch (error) {
       toast.error(error.message || 'Failed to create account');
     } finally {
@@ -156,6 +161,20 @@ export default function SignupForm({ onToggleForm }) {
             </div>
           </div>
 
+          {/* Register as dropdown */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">Register As</label>
+            <select
+              name="role"
+              value={formData.role}
+              onChange={handleChange}
+              className="w-full py-3 px-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none"
+            >
+              <option value="user">user</option>
+              <option value="admin">admin</option>
+            </select>
+          </div>
+
           {/* Submit Button */}
           <motion.button
             whileHover={{ scale: 1.02 }}
@@ -170,12 +189,11 @@ export default function SignupForm({ onToggleForm }) {
 
         <div className="mt-6 text-center">
           <button
-          onClick={() => navigate('/login')}
-          className="text-blue-600 hover:text-blue-800 font-medium transition-colors"
+            onClick={() => navigate('/login/user')}
+            className="text-blue-600 hover:text-blue-800 font-medium transition-colors"
           >
             Already have an account? Sign in
           </button>
-
         </div>
       </div>
     </motion.div>
